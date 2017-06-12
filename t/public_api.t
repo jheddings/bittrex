@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 12;
+use Test::Simple tests => 14;
 
 use Bittrex;
 
@@ -17,26 +17,27 @@ ok($bittrex->getmarketsummaries());
 ok($bittrex->getcurrencies());
 
 #-------------------------------------------------------------------------------
-## getticker
+## getticker (with some negative tests)
 
 ok($bittrex->getticker('BTC-ETH'));
-#ok(! $bittrex->getticker());
+ok(! $bittrex->getticker());
 ok(! $bittrex->getticker('-ETH'));
 
 #-------------------------------------------------------------------------------
-## getmarketsummary
+## getmarketsummary (with some negative tests)
 
 ok($bittrex->getmarketsummary('BTC-LTC'));
 ok(! $bittrex->getmarketsummary('-'));
 
 #-------------------------------------------------------------------------------
-## getmarkethistory
+## getmarkethistory (with some negative tests)
 
-ok($bittrex->getmarkethistory('BTC-LTC'));
+ok($bittrex->getmarkethistory('BTC-DASH'));
+ok(! $bittrex->getmarkethistory(''));
 ok(! $bittrex->getmarkethistory('NADA-NONE'));
 
 #-------------------------------------------------------------------------------
-## getorderbook
+## getorderbook (with some negative tests)
 
 ok($bittrex->getorderbook('BTC-LTC', 'both', 20));
 ok($bittrex->getorderbook('BTC-ETH', 'buy'));

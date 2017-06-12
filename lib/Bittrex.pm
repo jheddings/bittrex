@@ -1,27 +1,29 @@
 package Bittrex;
 
+=encoding utf8
+
+=head1 NAME
+
+Bittrex - API wrapper for the L<Bittrex|https://www.bittrex.com> trading platform.
+
+=cut
+
 use strict;
 use warnings;
 
 use JSON;
 use LWP::UserAgent;
-use HTML::Entities;
+use URI::Query;
 use Digest::SHA;
 use Data::Dumper;
 
-my $CLASS = __PACKAGE__;
+# TODO add logging
 
 our $VERSION = '0.1.0';
 
 use constant {
   APIROOT => 'https://bittrex.com/api/v1.1'
 };
-
-=encoding utf8
-
-=head1 NAME
-
-Bittrex - API wrapper for the L<Bittrex|https://www.bittrex.com> trading platform.
 
 =head1 SYNOPSIS
 
@@ -38,6 +40,10 @@ Bittrex - API wrapper for the L<Bittrex|https://www.bittrex.com> trading platfor
 This is a basic wrapper for the Bittrex API. It will handle API signing using
 your specific API keys. All information is exchanged directly with the Bittrex
 API service using a secure HTTPS connections.
+
+Unless otherwise specifically stated, each method returns the decoded JSON
+object in the C<result> field of the response. If a call fails, the method
+returns C<undef>.
 
 Bittrex is a leading cryptocurrency exchange for buying & selling digital
 currency. This software assumes no risk and makes no guarantees of performance
@@ -82,18 +88,20 @@ sub _get {
   my $self = shift;
   my ($path, $params) = @_;
 
-  # encode user-supplied query params
-  my $query = '?';
-  foreach my $param (sort keys %$params) {
-    my $value = encode_entities $params->{$param};
-    $query .= "$param=$value&";
+  if (defined $self->{key} and defined $self->{secret}) {
+    # TODO generate nonce
+    # TODO add apikey to params
+    # TODO generate hmac
   }
 
-  # XXX sign URL request
-  my $uri = APIROOT . $path . $query;
+  # build the URL string
+  my $qq = URI::Query->new($params);
+  my $uri = APIROOT . "$path?$qq";
+
+  printf("GET: %s\n", $uri);
 
   my $client = $self->{client};
-  my $resp = $client->get(APIROOT . $path . $query);
+  my $resp = $client->get($uri);
 
   unless ($resp->is_success) {
     die $resp->status_line;
