@@ -318,7 +318,7 @@ sub getbalance {
 Used to retrieve or generate an address for a specific currency. If one does not
 exist, the call will fail and return -1 until one is available.
 
-If successful, this method returns the deposit address as a string.
+On success, returns the deposit address as a string.
 
 C<currency> : (required) a string literal for the currency (ex: LTC)
 
@@ -353,6 +353,86 @@ sub getdepositaddress {
   }
 
   return $result->{Address};
+}
+
+################################################################################
+=item B<withdraw($currency, $quantity, $address, $paymentid)>
+
+Used to withdraw funds from your account. note: please account for txfee.
+
+On success, returns the withdrawal UUID as a string.
+
+C<currency> (required) a string literal for the currency (ie. BTC)
+C<quantity> (required) the quantity of coins to withdraw
+C<address> (required) the address where to send the funds.
+C<paymentid> (optional) required for some currencies (memo/tag/etc)
+
+=cut
+
+#---------------------------------------
+sub withdraw {
+  my $self = shift;
+  die 'not implemented';  # TODO
+}
+
+################################################################################
+=item B<getorder($uuid)>
+
+Used to retrieve a single order by uuid.
+
+C<uuid> (required) the uuid of the buy or sell order
+
+=cut
+
+#---------------------------------------
+sub getorder {
+  my $self = shift;
+  die 'not implemented';  # TODO
+}
+
+################################################################################
+=item B<getorderhistory($market)>
+
+Used to retrieve your order history.
+
+C<market> (optional) a string literal for the market (ie. BTC-LTC). If ommited, will return for all markets
+
+=cut
+
+#---------------------------------------
+sub getorderhistory {
+  my $self = shift;
+  die 'not implemented';  # TODO
+}
+
+################################################################################
+=item B<getwithdrawalhistory($currency)>
+
+Used to retrieve your withdrawal history.
+
+C<currency> (optional) a string literal for the currecy (ie. BTC). If omitted, will return for all currencies
+
+=cut
+
+#---------------------------------------
+sub getwithdrawalhistory {
+  my $self = shift;
+  die 'not implemented';  # TODO
+}
+
+################################################################################
+=item B<getdeposithistory($currency)>
+
+Used to retrieve your deposit history.
+
+C<currency> (optional) a string literal for the currecy (ie. BTC). If omitted, will return for all currencies
+
+=cut
+
+#---------------------------------------
+sub getdeposithistory {
+  my $self = shift;
+  die 'not implemented';  # TODO
 }
 
 1;  ## EOM
