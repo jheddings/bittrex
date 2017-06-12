@@ -85,7 +85,7 @@ sub new {
 }
 
 ################################################################################
-# TODO provide separate method for non-authenticated requests
+# TODO provide separate method for non-authenticated (public) requests
 sub _get {
   my $self = shift;
   my ($path, $params) = @_;
@@ -275,6 +275,87 @@ sub getmarkethistory {
   });
 
   return _standard_result($json);
+}
+
+################################################################################
+=item B<buylimit()>
+
+Used to place a buy-limit order in a specific market. Make sure you have the
+proper permissions set on your API keys for this call to work.
+
+On success, returns the UUID of the order.
+
+C<market> (required) a string literal for the market (ex: BTC-LTC)
+C<quantity> (required) the amount to purchase
+C<rate> (required) the rate at which to place the order.
+
+=cut
+
+#---------------------------------------
+sub buylimit {
+  my $self = shift;
+  die 'not implemented';  # TODO
+}
+
+################################################################################
+=item B<selllimit()>
+
+Used to place a sell-limit order in a specific market. Make sure you have the
+proper permissions set on your API keys for this call to work.
+
+On success, returns the UUID of the order.
+
+C<market> (required) a string literal for the market (ex: BTC-LTC)
+C<quantity> (required) the amount to purchase
+C<rate> (required) the rate at which to place the order.
+
+=cut
+
+#---------------------------------------
+sub selllimit {
+  my $self = shift;
+  die 'not implemented';  # TODO
+}
+
+################################################################################
+=item B<cancel($uuid)>
+
+Used to cancel a buy or sell order.
+
+C<uuid> (required) uuid of buy or sell order
+
+=cut
+
+#---------------------------------------
+sub cancel {
+  my $self = shift;
+  my ($uuid) = @_;
+
+  my $json = $self->_get('/market/cancel', {
+    uuid => $uuid
+  });
+
+  unless ($json->{success}) {
+    carp $json->{message};
+    return undef;
+  }
+
+  return 1;
+}
+
+################################################################################
+=item B<getopenorders($market)>
+
+Get all orders that you currently have opened. A specific market can be requested.
+
+C<market> (optional) a string literal for the market (ex: BTC-LTC)
+
+=cut
+
+#---------------------------------------
+sub getopenorders {
+  my $self = shift;
+  die 'not implemented';  # TODO
 }
 
 ################################################################################
