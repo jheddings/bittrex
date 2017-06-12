@@ -14,8 +14,8 @@ use warnings;
 use JSON;
 use LWP::UserAgent;
 use URI::Query;
-use Digest::SHA;
 use Data::Dumper;
+use Digest::SHA qw( hmac_sha512_hex );
 
 # TODO add logging
 
@@ -88,20 +88,20 @@ sub _get {
   my $self = shift;
   my ($path, $params) = @_;
 
-  if (defined $self->{key} and defined $self->{secret}) {
-    # TODO generate nonce
-    # TODO add apikey to params
-    # TODO generate hmac
+  # setup for api key signature
+  if (defined $self->{key}) {
+    my $nonce = time;
+    $params->{nonce} = $nonce;
+    $params->{apikey} = $self->{key};
   }
 
-  # build the URL string
+  # build the request
   my $qq = URI::Query->new($params);
   my $uri = APIROOT . "$path?$qq";
-
-  printf("GET: %s\n", $uri);
+  my $apisign = $self->_apisign($uri);
 
   my $client = $self->{client};
-  my $resp = $client->get($uri);
+  my $resp = $client->get($uri, apisign => $apisign);
 
   unless ($resp->is_success) {
     die $resp->status_line;
@@ -115,6 +115,12 @@ sub _get {
 sub _apisign {
   my $self = shift;
   my ($uri) = @_;
+
+  unless (defined $self->{secret}) {
+    return '';
+  }
+
+  hmac_sha512_hex($uri, $self->{secret});
 }
 
 ################################################################################
@@ -128,7 +134,7 @@ Used to get the open and available trading markets at Bittrex along with other m
 sub getmarkets {
   my $self = shift;
   my $json = $self->_get('/public/getmarkets');
-  $json->{success} ? $json->{result} : undef;
+  return $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
@@ -142,7 +148,7 @@ Used to get all supported currencies at Bittrex along with other metadata.
 sub getcurrencies {
   my $self = shift;
   my $json = $self->_get('/public/getcurrencies');
-  $json->{success} ? $json->{result} : undef;
+  return $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
@@ -156,7 +162,7 @@ Used to get the last 24 hour summary of all active exchanges.
 sub getmarketsummaries {
   my $self = shift;
   my $json = $self->_get('/public/getmarketsummaries');
-  $json->{success} ? $json->{result} : undef;
+  return $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
@@ -177,7 +183,7 @@ sub getticker {
     market => $market
   });
 
-  $json->{success} ? $json->{result} : undef;
+  return $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
@@ -198,7 +204,7 @@ sub getmarketsummary {
     market => $market
   });
 
-  $json->{success} ? $json->{result} : undef;
+  return $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
@@ -222,7 +228,7 @@ sub getorderbook {
     type => $type
   });
 
-  $json->{success} ? $json->{result} : undef;
+  return $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
@@ -243,7 +249,42 @@ sub getmarkethistory {
     market => $market
   });
 
-  $json->{success} ? $json->{result} : undef;
+  return $json->{success} ? $json->{result} : undef;
+}
+
+################################################################################
+=item B<getbalances()>
+
+Used to retrieve all balances from your account.
+
+=cut
+
+#---------------------------------------
+sub getbalances {
+  my $self = shift;
+  my $json = $self->_get('/account/getbalances');
+  return $json->{success} ? $json->{result} : undef;
+}
+
+################################################################################
+=item B<getbalance($currency)>
+
+Used to retrieve the balance from your account for a specific currency.
+
+C<currency> : (required) a string literal for the currency (ex: LTC)
+
+=cut
+
+#---------------------------------------
+sub getbalance {
+  my $self = shift;
+  my ($currency) = @_;
+
+  my $json = $self->_get('/account/getbalance', {
+    currency => $currency
+  });
+
+  return $json->{success} ? $json->{result} : undef;
 }
 
 1;  ## EOM

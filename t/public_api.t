@@ -3,9 +3,8 @@
 use strict;
 use warnings;
 
-use Test::Simple tests => 14;
-
 use Bittrex;
+use Test::Simple tests => 14;
 
 my $bittrex = Bittrex->new();
 
