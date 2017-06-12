@@ -11,6 +11,7 @@ Bittrex - API wrapper for the L<Bittrex|https://www.bittrex.com> trading platfor
 use strict;
 use warnings;
 
+use Carp;
 use JSON;
 use LWP::UserAgent;
 use URI::Query;
@@ -84,6 +85,7 @@ sub new {
 }
 
 ################################################################################
+# TODO provide separate method for non-authenticated requests
 sub _get {
   my $self = shift;
   my ($path, $params) = @_;
@@ -104,17 +106,40 @@ sub _get {
   my $resp = $client->get($uri, apisign => $apisign);
 
   unless ($resp->is_success) {
-    die $resp->status_line;
+    carp $resp->status_line;
+    return undef;
   }
 
   # TODO improve error handling
-  decode_json $resp->decoded_content;
+  return decode_json $resp->decoded_content;
+}
+
+################################################################################
+sub _standard_result {
+  my ($json) = @_;
+
+  unless ($json) {
+    carp 'no data in response';
+    return undef;
+  }
+
+  unless ($json->{success}) {
+    carp $json->{message};
+    return undef;
+  }
+
+  return $json->{result};
 }
 
 ################################################################################
 sub _apisign {
   my $self = shift;
   my ($uri) = @_;
+
+  # XXX this isn't entirely awesome... it would be nice if there was a way to
+  # include the query parameters in this method rather than handling them in
+  # another part of the method. not terrible, just seems like it would be more
+  # elegant to put all authentication / signing in the same place.
 
   unless (defined $self->{secret}) {
     return '';
@@ -134,7 +159,7 @@ Used to get the open and available trading markets at Bittrex along with other m
 sub getmarkets {
   my $self = shift;
   my $json = $self->_get('/public/getmarkets');
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
 }
 
 ################################################################################
@@ -148,7 +173,7 @@ Used to get all supported currencies at Bittrex along with other metadata.
 sub getcurrencies {
   my $self = shift;
   my $json = $self->_get('/public/getcurrencies');
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
 }
 
 ################################################################################
@@ -162,7 +187,7 @@ Used to get the last 24 hour summary of all active exchanges.
 sub getmarketsummaries {
   my $self = shift;
   my $json = $self->_get('/public/getmarketsummaries');
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
 }
 
 ################################################################################
@@ -183,7 +208,7 @@ sub getticker {
     market => $market
   });
 
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
 }
 
 ################################################################################
@@ -204,7 +229,7 @@ sub getmarketsummary {
     market => $market
   });
 
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
 }
 
 ################################################################################
@@ -228,7 +253,7 @@ sub getorderbook {
     type => $type
   });
 
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
 }
 
 ################################################################################
@@ -249,7 +274,7 @@ sub getmarkethistory {
     market => $market
   });
 
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
 }
 
 ################################################################################
@@ -263,7 +288,7 @@ Used to retrieve all balances from your account.
 sub getbalances {
   my $self = shift;
   my $json = $self->_get('/account/getbalances');
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
 }
 
 ################################################################################
@@ -284,7 +309,50 @@ sub getbalance {
     currency => $currency
   });
 
-  return $json->{success} ? $json->{result} : undef;
+  return _standard_result($json);
+}
+
+################################################################################
+=item B<getdepositaddress($currency)>
+
+Used to retrieve or generate an address for a specific currency. If one does not
+exist, the call will fail and return -1 until one is available.
+
+If successful, this method returns the deposit address as a string.
+
+C<currency> : (required) a string literal for the currency (ex: LTC)
+
+=cut
+
+#---------------------------------------
+sub getdepositaddress {
+  my $self = shift;
+  my ($currency) = @_;
+
+  my $json = $self->_get('/account/getdepositaddress', {
+    currency => $currency
+  });
+
+  # first check to see if the address is being generated...
+  if ($json->{message} eq 'ADDRESS_GENERATING') {
+    return -1;
+  }
+
+  # bail out if the call failed
+  unless ($json->{success}) {
+    carp $json->{message};
+    return undef;
+  }
+
+  my $result = $json->{result};
+
+  # just some sanity checking...
+  unless ($result->{Currency} eq $currency) {
+    carp 'returned currency did not match';
+    return undef;
+  }
+
+  return $result->{Address};
 }
 
 1;  ## EOM
