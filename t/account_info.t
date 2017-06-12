@@ -13,14 +13,12 @@ require("$FindBin::Bin/apikey.pl");
 my ($key, $secret) = APIKEY::load();
 
 if (defined $key and defined $secret) {
-  plan tests => 12;
+  plan tests => 10;
 } else {
   plan skip_all => 'apikey not found';
 }
 
 my $bittrex_auth = Bittrex->new($key, $secret);
-
-my $bittrex_no_auth = Bittrex->new();
 my $bittrex_no_secret = Bittrex->new($key, undef);
 my $bittrex_no_key = Bittrex->new(undef, $secret);
 
@@ -36,9 +34,6 @@ ok(! $bittrex_auth->getbalance());
 ok(! $bittrex_auth->getbalance('*'));
 
 ## check how things go with bad credentials...
-
-ok(! $bittrex_no_auth->getbalances());
-ok(! $bittrex_no_auth->getbalance('DASH'));
 
 ok(! $bittrex_no_key->getbalances());
 ok(! $bittrex_no_key->getbalance('BTC'));
