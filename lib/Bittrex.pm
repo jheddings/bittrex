@@ -33,10 +33,16 @@ sub new {
 ################################################################################
 sub _get {
   my $self = shift;
-  my $path = shift;
+  my ($path, $params) = @_;
 
-  # TODO support parameters
-  my $resp = $client->get(APIROOT . $path);
+  # encode query params
+  my $query = '?';
+  foreach my $param (sort keys %$params) {
+    my $value = encode_entities $params->{$param};
+    $query .= "$param=$value&";
+  }
+
+  my $resp = $client->get(APIROOT . $path . $query);
 
   unless ($resp->is_success) {
     die $resp->status_line;
@@ -73,45 +79,49 @@ sub getmarketsummaries {
 ################################################################################
 sub getticker {
   my $self = shift;
-
   my ($market) = @_;
-  $market = encode_entities($market);
 
-  my $json = $self->_get("/public/getticker?market=$market");
+  my $json = $self->_get('/public/getticker', {
+    market => $market
+  });
+
   $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
 sub getmarketsummary {
   my $self = shift;
-
   my ($market) = @_;
-  $market = encode_entities($market);
 
-  my $json = $self->_get("/public/getmarketsummary?market=$market");
+  my $json = $self->_get('/public/getmarketsummary', {
+    market => $market
+  });
+
   $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
 sub getorderbook {
   my $self = shift;
-
   my ($market, $type, $depth) = @_;
-  $market = encode_entities($market);
-  $type = encode_entities($type);
 
-  my $json = $self->_get("/public/getorderbook?market=$market&type=$type");
+  my $json = $self->_get('/public/getorderbook', {
+    market => $market,
+    type => $type
+  });
+
   $json->{success} ? $json->{result} : undef;
 }
 
 ################################################################################
 sub getmarkethistory {
   my $self = shift;
-
   my ($market) = @_;
-  $market = encode_entities($market);
 
-  my $json = $self->_get("/public/getmarkethistory?market=$market");
+  my $json = $self->_get('/public/getmarkethistory', {
+    market => $market
+  });
+
   $json->{success} ? $json->{result} : undef;
 }
 
