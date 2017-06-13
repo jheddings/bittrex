@@ -42,6 +42,8 @@ use Config::Simple;
 
 =item B<--getcurrencies> : get all supported currencies at Bittrex
 
+=item B<--getmarketsummaries> : get the last 24 hour summary of all active exchanges
+
 =item B<--getticker=mkt> : get the current tick values for a market (e.g. BTC-LTC)
 
 =over
@@ -60,6 +62,7 @@ my $secret = undef;
 
 my $do_getmarkets = undef;
 my $do_getcurrencies = undef;
+my $do_getmarketsummaries = undef;
 my $do_getticker = undef;
 
 GetOptions(
@@ -68,6 +71,7 @@ GetOptions(
   'secret=s' => \$secret,
   'getmarkets' => \$do_getmarkets,
   'getcurrencies' => \$do_getcurrencies,
+  'getmarketsummaries' => \$do_getmarketsummaries,
   'getticker=s' => \$do_getticker,
   'help|?' => \$opt_help
 ) or usage(1);
@@ -133,6 +137,20 @@ if ($do_getmarkets) {
 }
 
 #---------------------------------------
+# /public/getmarketsummaries
+if ($do_getmarketsummaries) {
+  my $summaries = $bittrex->getmarketsummaries();
+  if ($summaries) {
+    foreach (@{ $summaries }) {
+      printf("%s %f %f %f", $_->{MarketName}, $_->{High}, $_->{Low}, $_->{Volume});
+      printf("%f %f %f\n", $_->{Bid}, $_->{Ask}, $_->{Last});
+    }
+  } else {
+    printf("No market data available\n");
+  }
+}
+
+#---------------------------------------
 # /public/getcurrencies
 if ($do_getcurrencies) {
   my $currencies = $bittrex->getcurrencies();
@@ -142,7 +160,7 @@ if ($do_getcurrencies) {
              ($_->{IsActive} ? '' : 'Not '));
     }
   } else {
-    printf("No market data available\n");
+    printf("No currency data available\n");
   }
 }
 
