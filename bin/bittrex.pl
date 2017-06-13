@@ -53,6 +53,20 @@ use Data::Dumper;
 
 =back
 
+=head2 Market Methods
+
+=item B<--buy=mkt> : place a buy order for the specified market, requires C<--quantity>
+
+=item B<--sell=mkt> : place a sell order for the specified market, requires C<--quantity>
+
+=item B<--cancel=id> : cancel the trade order with the given ID
+
+=item B<--quantity=val> : specify the number of shares for an order
+
+=item B<--rate=val> : limit the buy or sell request to the given rate
+
+=back
+
 =cut
 
 ################################################################################
@@ -69,6 +83,13 @@ my $do_getmarketsummaries = undef;
 my $do_getmarketsummary = undef;
 my $do_getticker = undef;
 
+my $do_buy = undef;
+my $do_sell = undef;
+my $do_cancel = undef;
+
+my $opt_quantity = undef;
+my $opt_rate = undef;
+
 GetOptions(
   'keyfile=s' => \$keyfile,
   'apikey=s' => \$apikey,
@@ -78,6 +99,11 @@ GetOptions(
   'getmarketsummaries' => \$do_getmarketsummaries,
   'getmarketsummary=s' => \$do_getmarketsummary,
   'getticker=s' => \$do_getticker,
+  'buy=s' => \$do_buy,
+  'sell=s' => \$do_sell,
+  'cancel=s' => \$do_cancel,
+  'quantity=f' => \$opt_quantity,
+  'rate=f' => \$opt_rate,
   'help|?' => \$opt_help
 ) or usage(1);
 
@@ -87,6 +113,10 @@ usage('Must provide keyfile or apikey') unless ((defined $keyfile) or (defined $
 usage('Provide either keyfile or apikey (but not both)') if ((defined $keyfile) and (defined $apikey));
 usage('Must provide secret for apikey') if ((not defined $secret) and (defined $apikey));
 usage("Key file not found: $keyfile") if ((defined $keyfile) && (not -f $keyfile));
+
+usage('Cannot buy & sell at the same time') if ((defined $do_buy) and (defined $do_sell));
+usage('Must provide quantity for buy orders') if ((defined $do_buy) and (not defined $opt_quantity));
+usage('Must provide quantity for sell orders') if ((defined $do_sell) and (not defined $opt_quantity));
 
 ################################################################################
 # a convenience method for displaying usage information & exit with an error by default
@@ -141,7 +171,6 @@ if (defined $keyfile) {
 my $bittrex = Bittrex->new($apikey, $secret);
 
 #---------------------------------------
-# /public/getmarkets
 if ($do_getmarkets) {
   my $data = $bittrex->getmarkets();
   if ($data) {
@@ -154,7 +183,6 @@ if ($do_getmarkets) {
 }
 
 #---------------------------------------
-# /public/getmarketsummaries
 if ($do_getmarketsummaries) {
   my $data = $bittrex->getmarketsummaries();
   if ($data) {
@@ -167,7 +195,6 @@ if ($do_getmarketsummaries) {
 }
 
 #---------------------------------------
-# /public/getcurrencies
 if ($do_getcurrencies) {
   my $data = $bittrex->getcurrencies();
   if ($data) {
@@ -181,7 +208,6 @@ if ($do_getcurrencies) {
 }
 
 #---------------------------------------
-# /public/getticker
 if ($do_getticker) {
   my $data = $bittrex->getticker($do_getticker);
   if ($data) {
@@ -198,13 +224,57 @@ if ($do_getticker) {
 }
 
 #---------------------------------------
-# /public/getmarketsummary
 if ($do_getmarketsummary) {
   my $data = $bittrex->getmarketsummary($do_getmarketsummary);
   if ($data) {
     print_market_summary($data);
   } else {
     printf("No market data available for: $do_getmarketsummary\n");
+  }
+}
+
+#---------------------------------------
+if ($do_buy) {
+  unless (defined $opt_rate) {
+    my $data = $bittrex->getticker($do_buy);
+    $opt_rate = $data->{Ask};
+  }
+
+  printf("Placing BUY order for %f %s @ %f\n", $opt_quantity, $do_buy, $opt_rate);
+  my $id = $bittrex->buylimit($do_buy, $opt_quantity, $opt_rate);
+
+  if ($id) {
+    printf("Buy order placed: %s\n", $id);
+  } else {
+    printf("Buy order failed\n");
+  }
+}
+
+#---------------------------------------
+if ($do_sell) {
+  unless (defined $opt_rate) {
+    my $data = $bittrex->getticker($do_sell);
+    $opt_rate = $data->{Bid};
+  }
+
+  printf("Placing SELL order for %f %s @ %f\n", $opt_quantity, $do_sell, $opt_rate);
+  my $id = $bittrex->selllimit($do_sell, $opt_quantity, $opt_rate);
+
+  if ($id) {
+    printf("Order placed: %s\n", $id);
+  } else {
+    printf("Order failed\n");
+  }
+}
+
+#---------------------------------------
+if ($do_cancel) {
+  my $ret = $bittrex->cancel($do_cancel);
+
+  if ($ret) {
+    printf("Order canceled: %s\n", $do_cancel);
+  } else {
+    printf("Could not cancel order: %s\n", $do_cancel);
   }
 }
 

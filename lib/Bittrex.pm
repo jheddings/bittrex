@@ -275,7 +275,7 @@ sub getorderbook {
 }
 
 ################################################################################
-=item B<getmarkethistory()>
+=item B<getmarkethistory($market)>
 
 Used to retrieve the latest trades that have occured for a specific market.
 
@@ -294,7 +294,8 @@ sub getmarkethistory {
 }
 
 ################################################################################
-=item B<buylimit()>
+# TODO add convenience methd to buy at market value
+=item B<buylimit($market, $quantity, $rate)>
 
 Used to place a buy-limit order in a specific market. Make sure you have the
 proper permissions set on your API keys for this call to work.
@@ -310,11 +311,21 @@ C<rate> (required) the rate at which to place the order.
 #---------------------------------------
 sub buylimit {
   my $self = shift;
-  die 'not implemented';  # TODO
+  my ($market, $qty, $rate) = @_;
+
+  my $ret = $self->_signed_query('/market/buylimit', {
+    market => $market,
+    quantity => $qty,
+    rate => $rate
+  });
+
+  # return just the UUID, not the wrapper
+  return ($ret) ? $ret->{uuid} : undef;
 }
 
 ################################################################################
-=item B<selllimit()>
+# TODO add convenience methd to sell at market value
+=item B<selllimit($market, $quantity, $rate)>
 
 Used to place a sell-limit order in a specific market. Make sure you have the
 proper permissions set on your API keys for this call to work.
@@ -330,7 +341,16 @@ C<rate> (required) the rate at which to place the order.
 #---------------------------------------
 sub selllimit {
   my $self = shift;
-  die 'not implemented';  # TODO
+  my ($market, $qty, $rate) = @_;
+
+  my $ret = $self->_signed_query('/market/selllimit', {
+    market => $market,
+    quantity => $qty,
+    rate => $rate
+  });
+
+  # return just the UUID, not the wrapper
+  return ($ret) ? $ret->{uuid} : undef;
 }
 
 ################################################################################
