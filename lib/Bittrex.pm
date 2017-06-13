@@ -393,7 +393,11 @@ C<market> (optional) a string literal for the market (ex: BTC-LTC)
 #---------------------------------------
 sub getopenorders {
   my $self = shift;
-  die 'not implemented';  # TODO
+  my ($market) = @_;
+
+  return $self->_signed_query('/market/getopenorders', {
+    market => $market
+  });
 }
 
 ################################################################################

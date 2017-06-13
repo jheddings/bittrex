@@ -49,6 +49,8 @@ use Data::Dumper;
 
 =item B<--getmarketsummary=mkt> : get the last 24 hour summary for a market (e.g. BTC-LTC)
 
+=item B<--getopenorders=mkt> : get open orders for a given market or all markets if C<mkt> is omitted
+
 =back
 
 =head2 Account Methods
@@ -101,6 +103,7 @@ my $do_getbalance = undef;
 my $do_buy = undef;
 my $do_sell = undef;
 my $do_cancel = undef;
+my $do_getopenorders = undef;
 
 my $opt_quantity = undef;
 my $opt_rate = undef;
@@ -116,6 +119,7 @@ GetOptions(
   'getticker=s' => \$do_getticker,
   'getbalances' => \$do_getbalances,
   'getbalance=s' => \$do_getbalance,
+  'getopenorders:s' => \$do_getopenorders,
   'buy=s' => \$do_buy,
   'sell=s' => \$do_sell,
   'cancel=s' => \$do_cancel,
@@ -188,7 +192,7 @@ if (defined $keyfile) {
 my $bittrex = Bittrex->new($apikey, $secret);
 
 #---------------------------------------
-if ($do_getmarkets) {
+if (defined $do_getmarkets) {
   my $data = $bittrex->getmarkets();
   if ($data) {
     foreach (@{ $data }) {
@@ -200,7 +204,7 @@ if ($do_getmarkets) {
 }
 
 #---------------------------------------
-if ($do_getmarketsummaries) {
+if (defined $do_getmarketsummaries) {
   my $data = $bittrex->getmarketsummaries();
   if ($data) {
     foreach (@{ $data }) {
@@ -212,7 +216,7 @@ if ($do_getmarketsummaries) {
 }
 
 #---------------------------------------
-if ($do_getcurrencies) {
+if (defined $do_getcurrencies) {
   my $data = $bittrex->getcurrencies();
   if ($data) {
     foreach (@{ $data }) {
@@ -225,7 +229,7 @@ if ($do_getcurrencies) {
 }
 
 #---------------------------------------
-if ($do_getticker) {
+if (defined $do_getticker) {
   my $data = $bittrex->getticker($do_getticker);
   if ($data) {
       my $bid = $data->{Bid};
@@ -241,7 +245,7 @@ if ($do_getticker) {
 }
 
 #---------------------------------------
-if ($do_getmarketsummary) {
+if (defined $do_getmarketsummary) {
   my $data = $bittrex->getmarketsummary($do_getmarketsummary);
   if ($data) {
     print_market_summary($data);
@@ -251,7 +255,7 @@ if ($do_getmarketsummary) {
 }
 
 #---------------------------------------
-if ($do_buy) {
+if (defined $do_buy) {
   unless (defined $opt_rate) {
     my $data = $bittrex->getticker($do_buy);
     $opt_rate = $data->{Ask};
@@ -268,7 +272,7 @@ if ($do_buy) {
 }
 
 #---------------------------------------
-if ($do_sell) {
+if (defined $do_sell) {
   unless (defined $opt_rate) {
     my $data = $bittrex->getticker($do_sell);
     $opt_rate = $data->{Bid};
@@ -285,7 +289,7 @@ if ($do_sell) {
 }
 
 #---------------------------------------
-if ($do_cancel) {
+if (defined $do_cancel) {
   my $ret = $bittrex->cancel($do_cancel);
 
   if ($ret) {
@@ -296,7 +300,22 @@ if ($do_cancel) {
 }
 
 #---------------------------------------
-if ($do_getbalances) {
+if (defined $do_getopenorders) {
+  my $data = $bittrex->getopenorders($do_getopenorders);
+  if ($data and (scalar @{ $data})) {
+    foreach (@{ $data }) {
+      #TODO display quantity remaining
+      #TODO how to use Price vs Limit ?
+      printf("%s: %s %f @ %f - %s\n", $_->{Exchange}, $_->{OrderType},
+             $_->{Quantity}, $_->{Limit}, $_->{OrderUuid});
+    }
+  } else {
+    printf("No open orders\n");
+  }
+}
+
+#---------------------------------------
+if (defined $do_getbalances) {
   my $data = $bittrex->getbalances();
   if ($data) {
     foreach (@{ $data }) {
@@ -310,7 +329,7 @@ if ($do_getbalances) {
 }
 
 #---------------------------------------
-if ($do_getbalance) {
+if (defined $do_getbalance) {
   my $data = $bittrex->getbalance($do_getbalance);
   if ($data) {
     printf("%s: %f [%f]\n", $data->{Currency}, $data->{Balance}, $data->{Available});
