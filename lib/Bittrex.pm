@@ -229,11 +229,17 @@ sub getmarketsummary {
     market => $market
   });
 
-  return _standard_result($json);
+  # the result comes back as an array with a single element...
+  # peel it back to help the caller out
+
+  my $ret = _standard_result($json);
+  unless ($ret) { return undef };
+
+  return @{ $ret }[0];
 }
 
 ################################################################################
-=item B<getorderbook()>
+=item B<getorderbook($market, $type, $depth)>
 
 Used to get retrieve the orderbook for a given market
 

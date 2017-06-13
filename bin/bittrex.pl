@@ -21,6 +21,7 @@ use Pod::Usage;
 
 use Bittrex;
 use Config::Simple;
+use Data::Dumper;
 
 =head1 OPTIONS
 
@@ -44,7 +45,9 @@ use Config::Simple;
 
 =item B<--getmarketsummaries> : get the last 24 hour summary of all active exchanges
 
-=item B<--getticker=mkt> : get the current tick values for a market (e.g. BTC-LTC)
+=item B<--getticker=mkt> : get the current ticker values for a market (e.g. BTC-LTC)
+
+=item B<--getmarketsummary=mkt> : get the last 24 hour summary for a market (e.g. BTC-LTC)
 
 =over
 
@@ -63,6 +66,7 @@ my $secret = undef;
 my $do_getmarkets = undef;
 my $do_getcurrencies = undef;
 my $do_getmarketsummaries = undef;
+my $do_getmarketsummary = undef;
 my $do_getticker = undef;
 
 GetOptions(
@@ -72,6 +76,7 @@ GetOptions(
   'getmarkets' => \$do_getmarkets,
   'getcurrencies' => \$do_getcurrencies,
   'getmarketsummaries' => \$do_getmarketsummaries,
+  'getmarketsummary=s' => \$do_getmarketsummary,
   'getticker=s' => \$do_getticker,
   'help|?' => \$opt_help
 ) or usage(1);
@@ -114,6 +119,18 @@ sub load_keyfile {
 }
 
 ################################################################################
+sub print_market_summary {
+  my $data = shift;
+
+  print $data->{MarketName};
+
+  printf(" %f %f %f", $data->{High}, $data->{Low}, $data->{Volume});
+  printf(" %f %f %f", $data->{Bid}, $data->{Ask}, $data->{Last});
+
+  print"\n";
+}
+
+################################################################################
 ## MAIN ENTRY
 
 if (defined $keyfile) {
@@ -126,9 +143,9 @@ my $bittrex = Bittrex->new($apikey, $secret);
 #---------------------------------------
 # /public/getmarkets
 if ($do_getmarkets) {
-  my $markets = $bittrex->getmarkets();
-  if ($markets) {
-    foreach (@{ $markets }) {
+  my $data = $bittrex->getmarkets();
+  if ($data) {
+    foreach (@{ $data }) {
       printf("%s : %sActive\n", $_->{MarketName}, ($_->{IsActive} ? '' : 'Not '));
     }
   } else {
@@ -139,11 +156,10 @@ if ($do_getmarkets) {
 #---------------------------------------
 # /public/getmarketsummaries
 if ($do_getmarketsummaries) {
-  my $summaries = $bittrex->getmarketsummaries();
-  if ($summaries) {
-    foreach (@{ $summaries }) {
-      printf("%s %f %f %f", $_->{MarketName}, $_->{High}, $_->{Low}, $_->{Volume});
-      printf("%f %f %f\n", $_->{Bid}, $_->{Ask}, $_->{Last});
+  my $data = $bittrex->getmarketsummaries();
+  if ($data) {
+    foreach (@{ $data }) {
+      print_market_summary($_);
     }
   } else {
     printf("No market data available\n");
@@ -153,9 +169,9 @@ if ($do_getmarketsummaries) {
 #---------------------------------------
 # /public/getcurrencies
 if ($do_getcurrencies) {
-  my $currencies = $bittrex->getcurrencies();
-  if ($currencies) {
-    foreach (@{ $currencies }) {
+  my $data = $bittrex->getcurrencies();
+  if ($data) {
+    foreach (@{ $data }) {
       printf("%s [%s] : %sActive\n", $_->{CurrencyLong}, $_->{Currency},
              ($_->{IsActive} ? '' : 'Not '));
     }
@@ -167,17 +183,28 @@ if ($do_getcurrencies) {
 #---------------------------------------
 # /public/getticker
 if ($do_getticker) {
-  my $ticker = $bittrex->getticker($do_getticker);
-  if ($ticker) {
-      my $bid = $ticker->{Bid};
-      my $ask = $ticker->{Ask};
-      my $last = $ticker->{Last};
+  my $data = $bittrex->getticker($do_getticker);
+  if ($data) {
+      my $bid = $data->{Bid};
+      my $ask = $data->{Ask};
+      my $last = $data->{Last};
       my $spread = ($ask - $bid) / $ask;
 
       printf("%f / %f (%.4f%%) : %f\n", $bid, $ask, 100*$spread, $last)
 
   } else {
     printf("Ticker data unavailable for %s\n", $do_getticker);
+  }
+}
+
+#---------------------------------------
+# /public/getmarketsummary
+if ($do_getmarketsummary) {
+  my $data = $bittrex->getmarketsummary($do_getmarketsummary);
+  if ($data) {
+    print_market_summary($data);
+  } else {
+    printf("No market data available for: $do_getmarketsummary\n");
   }
 }
 
