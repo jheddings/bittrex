@@ -53,6 +53,8 @@ imply any recommendations for investment strategies.
 
 Full API documentation can be found here: L<https://bittrex.com/Home/Api>.
 
+This module is current as of API version 1.1.
+
 =head2 Methods
 
 =over
