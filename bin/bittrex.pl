@@ -49,15 +49,27 @@ use Data::Dumper;
 
 =item B<--getmarketsummary=mkt> : get the last 24 hour summary for a market (e.g. BTC-LTC)
 
+=back
+
+=head2 Account Methods
+
+=item B<--getbalances> : get all account balances
+
+=item B<--getbalance=cur> : get account balances for the given currency (e.g. ETH)
+
 =over
 
 =back
 
 =head2 Market Methods
 
-=item B<--buy=mkt> : place a buy order for the specified market, requires C<--quantity>
+=over
 
-=item B<--sell=mkt> : place a sell order for the specified market, requires C<--quantity>
+=item B<--buy=mkt> : place a buy order for the specified market,
+requires C<--quantity>
+
+=item B<--sell=mkt> : place a sell order for the specified market,
+if C<--quantity> is not given, all shares will be sold
 
 =item B<--cancel=id> : cancel the trade order with the given ID
 
@@ -83,6 +95,9 @@ my $do_getmarketsummaries = undef;
 my $do_getmarketsummary = undef;
 my $do_getticker = undef;
 
+my $do_getbalances = undef;
+my $do_getbalance = undef;
+
 my $do_buy = undef;
 my $do_sell = undef;
 my $do_cancel = undef;
@@ -99,6 +114,8 @@ GetOptions(
   'getmarketsummaries' => \$do_getmarketsummaries,
   'getmarketsummary=s' => \$do_getmarketsummary,
   'getticker=s' => \$do_getticker,
+  'getbalances' => \$do_getbalances,
+  'getbalance=s' => \$do_getbalance,
   'buy=s' => \$do_buy,
   'sell=s' => \$do_sell,
   'cancel=s' => \$do_cancel,
@@ -275,6 +292,30 @@ if ($do_cancel) {
     printf("Order canceled: %s\n", $do_cancel);
   } else {
     printf("Could not cancel order: %s\n", $do_cancel);
+  }
+}
+
+#---------------------------------------
+if ($do_getbalances) {
+  my $data = $bittrex->getbalances();
+  if ($data) {
+    foreach (@{ $data }) {
+      if ($_->{Balance} gt 0.0) {
+        printf("%s: %f [%f]\n", $_->{Currency}, $_->{Balance}, $_->{Available});
+      }
+    }
+  } else {
+    printf("No currency data available\n");
+  }
+}
+
+#---------------------------------------
+if ($do_getbalance) {
+  my $data = $bittrex->getbalance($do_getbalance);
+  if ($data) {
+    printf("%s: %f [%f]\n", $data->{Currency}, $data->{Balance}, $data->{Available});
+  } else {
+    printf("No currency data available\n");
   }
 }
 
