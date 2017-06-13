@@ -521,6 +521,24 @@ sub getdeposithistory {
 
 =back
 
+=head1 AUTHOR
+
+Developed and maintained by C<jheddings>.
+
+Tips are always appreciated!
+
+=over
+
+=item BTC - C<1K6mkumfqTQTF4HJuLZAh1g8uRHQhWLomz>
+
+=item ETH - C<0xA114CE80Fc995a993d5726a74DAf08ad8C739Af4>
+
+=item DASH - C<XmTsc9qQQctrauq8zVXXoL9c8DKd29q2Gd>
+
+=item LTC - C<LLscXRCUndQRjQdbTouvDE9NH5fiaanZzo>
+
+=back
+
 =head1 COPYRIGHT
 
 Copyright (c) 2017 Jason Heddings
