@@ -4,7 +4,17 @@ package Bittrex;
 
 =head1 NAME
 
-Bittrex - API wrapper for the L<Bittrex|https://www.bittrex.com> trading platform.
+Bittrex - API wrapper for the L<Bittrex|https://www.bittrex.com> exchange.
+
+=head1 SYNOPSIS
+
+  use Bittrex;
+
+  my $bittrex = Bittrex->new();
+  my $market_data = $bittrex->getmarkets();
+
+  my $account = Bittrex->new($apikey, $apisecret);
+  my $balances = $bittrex->getbalances();
 
 =cut
 
@@ -26,16 +36,6 @@ use constant {
   APIROOT => 'https://bittrex.com/api/v1.1'
 };
 
-=head1 SYNOPSIS
-
-  use Bittrex;
-
-  my $bittrex = Bittrex->new();
-  my $market_data = $bittrex->getmarkets();
-
-  my $account = Bittrex->new($apikey, $apisecret);
-  my $balances = $bittrex->getbalances();
-
 =head1 DESCRIPTION
 
 This is a basic wrapper for the Bittrex API. It will handle API signing using
@@ -55,7 +55,7 @@ Full API documentation can be found here: L<https://bittrex.com/Home/Api>.
 
 =head2 Methods
 
-=over 4
+=over
 
 =cut
 
