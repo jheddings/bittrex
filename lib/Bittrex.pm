@@ -85,15 +85,34 @@ sub new {
 }
 
 ################################################################################
-# TODO provide separate method for non-authenticated (public) requests
+sub _public_query {
+  my $self = shift;
+  my ($path, $params) = @_;
+
+  my $json = $self->_get($path, $params);
+
+  return _standard_result($json);
+}
+
+################################################################################
+sub _signed_query {
+  my $self = shift;
+  my ($path, $params) = @_;
+
+  my $json = $self->_get($path, $params);
+
+  return _standard_result($json);
+}
+
+################################################################################
+# TODO move signing function into appropriate query
 sub _get {
   my $self = shift;
   my ($path, $params) = @_;
 
   # setup for api key signature
   if (defined $self->{key}) {
-    my $nonce = time;
-    $params->{nonce} = $nonce;
+    $params->{nonce} = time;
     $params->{apikey} = $self->{key};
   }
 
@@ -158,8 +177,7 @@ Used to get the open and available trading markets at Bittrex along with other m
 #---------------------------------------
 sub getmarkets {
   my $self = shift;
-  my $json = $self->_get('/public/getmarkets');
-  return _standard_result($json);
+  return $self->_public_query('/public/getmarkets');
 }
 
 ################################################################################
@@ -172,8 +190,7 @@ Used to get all supported currencies at Bittrex along with other metadata.
 #---------------------------------------
 sub getcurrencies {
   my $self = shift;
-  my $json = $self->_get('/public/getcurrencies');
-  return _standard_result($json);
+  return $self->_public_query('/public/getcurrencies');
 }
 
 ################################################################################
@@ -186,8 +203,7 @@ Used to get the last 24 hour summary of all active exchanges.
 #---------------------------------------
 sub getmarketsummaries {
   my $self = shift;
-  my $json = $self->_get('/public/getmarketsummaries');
-  return _standard_result($json);
+  return $self->_public_query('/public/getmarketsummaries');
 }
 
 ################################################################################
@@ -204,11 +220,9 @@ sub getticker {
   my $self = shift;
   my ($market) = @_;
 
-  my $json = $self->_get('/public/getticker', {
+  return $self->_public_query('/public/getticker', {
     market => $market
   });
-
-  return _standard_result($json);
 }
 
 ################################################################################
@@ -254,12 +268,10 @@ sub getorderbook {
   my $self = shift;
   my ($market, $type, $depth) = @_;
 
-  my $json = $self->_get('/public/getorderbook', {
+  return $self->_public_query('/public/getorderbook', {
     market => $market,
     type => $type
   });
-
-  return _standard_result($json);
 }
 
 ################################################################################
@@ -276,11 +288,9 @@ sub getmarkethistory {
   my $self = shift;
   my ($market) = @_;
 
-  my $json = $self->_get('/public/getmarkethistory', {
+  return $self->_public_query('/public/getmarkethistory', {
     market => $market
   });
-
-  return _standard_result($json);
 }
 
 ################################################################################
@@ -374,8 +384,7 @@ Used to retrieve all balances from your account.
 #---------------------------------------
 sub getbalances {
   my $self = shift;
-  my $json = $self->_get('/account/getbalances');
-  return _standard_result($json);
+  return $self->_signed_query('/account/getbalances');
 }
 
 ################################################################################
@@ -392,11 +401,9 @@ sub getbalance {
   my $self = shift;
   my ($currency) = @_;
 
-  my $json = $self->_get('/account/getbalance', {
+  return $self->_signed_query('/account/getbalance', {
     currency => $currency
   });
-
-  return _standard_result($json);
 }
 
 ################################################################################
@@ -416,6 +423,7 @@ sub getdepositaddress {
   my $self = shift;
   my ($currency) = @_;
 
+  # we need the full response to examine the 'message' field
   my $json = $self->_get('/account/getdepositaddress', {
     currency => $currency
   });
