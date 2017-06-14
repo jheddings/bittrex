@@ -6,7 +6,7 @@ use warnings;
 use Bittrex;
 use Test::Simple tests => 9;
 
-# simple tests to make sure bad keys work
+# simple tests to make sure bad keys don't work
 my $bittrex_no_auth = Bittrex->new();
 my $bittrex_bad_key = Bittrex->new('no_key', undef);
 my $bittrex_bad_secret = Bittrex->new(undef, 'no_secret');
