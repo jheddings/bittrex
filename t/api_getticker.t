@@ -4,13 +4,20 @@ use strict;
 use warnings;
 
 use Bittrex;
-use Test::Simple tests => 5;
+use Test::Simple tests => 8;
 
 my $bittrex = Bittrex->new();
 
 #-------------------------------------------------------------------------------
 
-ok($bittrex->getticker('BTC-ETH'));
+my $data = $bittrex->getticker('BTC-ETH');
+ok(defined $data);
+
+ok(exists $data->{Bid});
+ok(exists $data->{Ask});
+ok(exists $data->{Last});
+
+# some basic negative testing...
 
 ok(! $bittrex->getticker());
 ok(! $bittrex->getticker('-ETH'));
