@@ -30,7 +30,7 @@ use Digest::SHA qw( hmac_sha512_hex );
 
 # TODO add logging
 
-our $VERSION = '0.1.0';
+our $VERSION = '1.0';
 
 use constant {
   APIROOT => 'https://bittrex.com/api/v1.1'
