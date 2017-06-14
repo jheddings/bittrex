@@ -563,7 +563,7 @@ sub getdeposithistory {
 
 =head1 AUTHOR
 
-Developed and maintained by C<jheddings>.
+Developed and maintained by L<jheddings|https://github.com/jheddings>.
 
 Tips are always appreciated!
 
@@ -584,6 +584,7 @@ Tips are always appreciated!
 Copyright (c) 2017 Jason Heddings
 
 Licensed under the terms of the L<MIT License|https://opensource.org/licenses/MIT>,
-which is also included in the original source code of this project.
+which is also included in the original L<source code|https://github.com/jheddings/bittrex>
+of this project.
 
 =cut
