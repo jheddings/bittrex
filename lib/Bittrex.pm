@@ -493,7 +493,17 @@ C<paymentid> (optional) required for some currencies (memo/tag/etc)
 #---------------------------------------
 sub withdraw {
   my $self = shift;
-  die 'not implemented';  # TODO
+  my ($currency, $qty, $address, $memo) = @_;
+
+  my $ret = $self->_signed_query('/account/withdraw', {
+    currency => $currency,
+    quantity => $qty,
+    address => $address,
+    paymentid => $memo
+  });
+
+  # return just the UUID, not the wrapper
+  return ($ret) ? $ret->{uuid} : undef;
 }
 
 ################################################################################
@@ -508,7 +518,11 @@ C<uuid> (required) the uuid of the buy or sell order
 #---------------------------------------
 sub getorder {
   my $self = shift;
-  die 'not implemented';  # TODO
+  my ($uuid) = @_;
+
+  return $self->_signed_query('/account/getorder', {
+    uuid => $uuid
+  });
 }
 
 ################################################################################
@@ -523,7 +537,11 @@ C<market> (optional) a string literal for the market (ie. BTC-LTC). If ommited, 
 #---------------------------------------
 sub getorderhistory {
   my $self = shift;
-  die 'not implemented';  # TODO
+  my ($market) = @_;
+
+  return $self->_signed_query('/account/getorderhistory', {
+    market => $market
+  });
 }
 
 ################################################################################
@@ -538,7 +556,11 @@ C<currency> (optional) a string literal for the currecy (ie. BTC). If omitted, w
 #---------------------------------------
 sub getwithdrawalhistory {
   my $self = shift;
-  die 'not implemented';  # TODO
+  my ($currency) = @_;
+
+  return $self->_signed_query('/account/getwithdrawalhistory', {
+    currency => $currency
+  });
 }
 
 ################################################################################
@@ -553,7 +575,11 @@ C<currency> (optional) a string literal for the currecy (ie. BTC). If omitted, w
 #---------------------------------------
 sub getdeposithistory {
   my $self = shift;
-  die 'not implemented';  # TODO
+  my ($currency) = @_;
+
+  return $self->_signed_query('/account/getdeposithistory', {
+    currency => $currency
+  });
 }
 
 1;  ## EOM
