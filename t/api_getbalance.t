@@ -12,34 +12,43 @@ use Test::More;
 require("$FindBin::Bin/apikey.pl");
 my ($key, $secret) = APIKEY::load();
 
-if (defined $key and defined $secret) {
-  plan tests => 11;
-} else {
+unless (defined $key and defined $secret) {
   plan skip_all => 'apikey not found';
 }
 
-my $bittrex_auth = Bittrex->new($key, $secret);
-my $bittrex_no_secret = Bittrex->new($key, undef);
-my $bittrex_no_key = Bittrex->new(undef, $secret);
+my $bittrex = Bittrex->new($key, $secret);
 
 #-------------------------------------------------------------------------------
-sub check_balance {
-  my $cur = shift;
+sub verify_balance {
+  my ($cur, $bal) = @_;
 
-  my $bal = $bittrex_auth->getbalance($cur);
-  ok($bal->{Currency} eq $cur);
+  my $data = $bittrex->getbalance($cur);
 
-  # perform some negative tests while we are here...
-  ok(! $bittrex_no_key->getbalance($cur));
-  ok(! $bittrex_no_secret->getbalance($cur));
+  ok($data->{Currency} eq $cur);
+  ok($data->{Balance} eq $bal);
 }
 
 #-------------------------------------------------------------------------------
+## confirm all balances match
 
-check_balance('BTC');
-check_balance('ETH');
-check_balance('DASH');
+my $balances = $bittrex->getbalances();
 
-ok(! $bittrex_auth->getbalance());
-ok(! $bittrex_auth->getbalance('*'));
+ok($balances);
+ok(scalar @{ $balances } gt 0);
 
+foreach (@{ $balances }) {
+  verify_balance($_->{Currency}, $_->{Balance});
+}
+
+#-------------------------------------------------------------------------------
+## do some negative testing
+
+ok(! $bittrex->getbalance());
+ok(! $bittrex->getbalance('%'));
+
+# remove API key...
+$bittrex = Bittrex->new();
+
+ok(! $bittrex->getbalance('BTC'));
+
+done_testing();
