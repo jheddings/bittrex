@@ -13,7 +13,7 @@ require("$FindBin::Bin/apikey.pl");
 my ($key, $secret) = APIKEY::load();
 
 if (defined $key and defined $secret) {
-  plan tests => 13;
+  plan tests => 3;
 } else {
   plan skip_all => 'apikey not found';
 }
@@ -23,29 +23,9 @@ my $bittrex_no_secret = Bittrex->new($key, undef);
 my $bittrex_no_key = Bittrex->new(undef, $secret);
 
 #-------------------------------------------------------------------------------
-## basic account calls
 
 ok($bittrex_auth->getbalances());
-ok($bittrex_auth->getbalance('BTC'));
-ok($bittrex_auth->getbalance('ETH'));
-ok($bittrex_auth->getbalance('DASH'));
-
-ok(! $bittrex_auth->getbalance());
-ok(! $bittrex_auth->getbalance('*'));
-
-## check how things go with bad credentials...
 
 ok(! $bittrex_no_key->getbalances());
-ok(! $bittrex_no_key->getbalance('BTC'));
-
 ok(! $bittrex_no_secret->getbalances());
-ok(! $bittrex_no_secret->getbalance('ETH'));
 
-#-------------------------------------------------------------------------------
-## working with a deposit address...
-
-# TODO mock out generating a new address
-
-ok($bittrex_auth->getdepositaddress('BTC'));
-ok(! $bittrex_auth->getdepositaddress('*'));
-ok(! $bittrex_auth->getdepositaddress());
