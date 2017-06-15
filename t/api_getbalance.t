@@ -4,13 +4,12 @@ use strict;
 use warnings;
 
 use Bittrex;
-use FindBin;
 use Test::More;
 
 #-------------------------------------------------------------------------------
 # load the user's custom API key and secret
-require("$FindBin::Bin/apikey.pl");
-my ($key, $secret) = APIKEY::load();
+use Bittrex::Keyfile;
+my ($key, $secret) = Bittrex::Keyfile::load();
 
 unless (defined $key and defined $secret) {
   plan skip_all => 'apikey not found';

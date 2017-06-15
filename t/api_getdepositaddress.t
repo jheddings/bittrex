@@ -9,11 +9,11 @@ use Test::More;
 
 #-------------------------------------------------------------------------------
 # load the user's custom API key and secret
-require("$FindBin::Bin/apikey.pl");
-my ($key, $secret) = APIKEY::load();
+use Bittrex::Keyfile;
+my ($key, $secret) = Bittrex::Keyfile::load();
 
 if (defined $key and defined $secret) {
-  plan tests => 4;
+  plan tests => 5;
 } else {
   plan skip_all => 'apikey not found';
 }
@@ -31,3 +31,7 @@ ok($btc_addr ne -1);
 
 ok(! $bittrex->getdepositaddress('*'));
 ok(! $bittrex->getdepositaddress());
+
+# remove API key...
+$bittrex = Bittrex->new();
+ok(! $bittrex->getdepositaddress('BTC'));

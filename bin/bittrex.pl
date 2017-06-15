@@ -20,6 +20,7 @@ use Scalar::Util qw( looks_like_number );
 use Pod::Usage;
 
 use Bittrex;
+use Bittrex::Keyfile;
 use Config::Simple;
 use Data::Dumper;
 
@@ -157,19 +158,6 @@ sub usage {
 }
 
 ################################################################################
-sub load_keyfile {
-  my $keyfile = shift;
-
-  # TODO better error handling if the file cannot be parsed or params are missing
-
-  my $cfg = new Config::Simple($keyfile);
-  my $key = $cfg->param('key');
-  my $secret = $cfg->param('secret');
-
-  return ($key, $secret);
-}
-
-################################################################################
 sub print_market_summary {
   my $data = shift;
 
@@ -185,7 +173,7 @@ sub print_market_summary {
 ## MAIN ENTRY
 
 if (defined $keyfile) {
-  ($apikey, $secret) = load_keyfile($keyfile);
+  ($apikey, $secret) = Bittrex::Keyfile::load($keyfile);
 }
 
 # common client instance

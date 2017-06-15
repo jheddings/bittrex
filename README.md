@@ -26,10 +26,9 @@ the installation.  Parameters may be optionally passed to `Makefile.PL` to alter
 behavior.  The most common parameter to set is `INSTALL_BASE` which sets the top of the
 installation target.
 
-For example, to change the installation location system Perl lib, issue the following
-command in place of the first step above:
+For example, to change the base installation path, use the following:
 
-    perl Makefile.PL INSTALL_BASE=/usr/local/lib/perl
+    perl Makefile.PL INSTALL_BASE=/usr/local
 
 Tests are included with the module, however they require a valid API key in order to
 succeed.  Eventually, I hope to mock out the API so they can run without direct access
