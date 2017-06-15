@@ -1,7 +1,20 @@
 # NAME
 
-This project contains a Perl wrapper for the Bittrex API as well as command line utilities
-to demonstrate usage.
+Bittrex - modules and utilities for interacting with the
+[Bittrex](https://www.bittrex.com) exchange.
+
+# SYNOPSIS
+
+This project consists of the `Bittrex::API` module:
+
+    use Bittrex::API;
+
+    my $bittrex = Bittrex::API->new();
+    my $market_data = $bittrex->getmarkets();
+
+There is also a utility for interacting with the exchange from the command line:
+
+    bittrex.pl --keyfile=apikey.cfg --getbalances
 
 # DESCRIPTION
 
@@ -13,6 +26,11 @@ imply any recommendations for investment strategies.
 Full API documentation can be found here:
 [https://bittrex.com/Home/Api](https://bittrex.com/Home/Api).
 
+# REQUIREMENTS
+
+- **URI::Query** - to build proper query strings for requests
+- **Config::Simple** - used to read configuration files
+
 # INSTALLATION
 
 To install using the default options and location, use the following commands:
@@ -21,7 +39,7 @@ To install using the default options and location, use the following commands:
     make
     make install
 
-See [ExtUtils::MakeMaker](http://perldoc.perl.org/ExtUtils/MakeMaker.html) for customizing
+See ["/perldoc.perl.org/ExtUtils/MakeMaker.html" in ExtUtils::MakeMaker}http:](https://metacpan.org/pod/ExtUtils::MakeMaker}http:#perldoc.perl.org-ExtUtils-MakeMaker.html) for customizing
 the installation.  Parameters may be optionally passed to `Makefile.PL` to alter the
 behavior.  The most common parameter to set is `INSTALL_BASE` which sets the top of the
 installation target.
@@ -35,11 +53,6 @@ succeed.  Eventually, I hope to mock out the API so they can run without direct 
 to the API service.  If that happens, or you just want to try it out, use the following:
 
     make test
-
-# REQUIREMENTS
-
-- **URI::Query** - to build proper query strings for requests
-- **Config::Simple** - used to read configuration files
 
 # AUTHOR
 
@@ -57,4 +70,5 @@ Tips are always appreciated!
 Copyright (c) 2017 Jason Heddings
 
 Licensed under the terms of the [MIT License](https://opensource.org/licenses/MIT),
-which is also included in the original source code of this project.
+which is also included in the original [source code](https://github.com/jheddings/bittrex)
+of this project.
