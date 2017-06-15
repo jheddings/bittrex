@@ -39,7 +39,7 @@ To install using the default options and location, use the following commands:
     make
     make install
 
-See ["/perldoc.perl.org/ExtUtils/MakeMaker.html" in ExtUtils::MakeMaker}http:](https://metacpan.org/pod/ExtUtils::MakeMaker}http:#perldoc.perl.org-ExtUtils-MakeMaker.html) for customizing
+See [ExtUtils::MakeMaker](http://perldoc.perl.org/ExtUtils/MakeMaker.html) for customizing
 the installation.  Parameters may be optionally passed to `Makefile.PL` to alter the
 behavior.  The most common parameter to set is `INSTALL_BASE` which sets the top of the
 installation target.
