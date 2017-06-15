@@ -45,6 +45,8 @@ On success, returns a tuple containing the key and secret found the keyfile.
 
 =cut
 
+# TODO add support for environment variables (e.g. BITTREX_KEYFILE)
+
 #---------------------------------------
 sub load {
   my $keyfile = shift;
