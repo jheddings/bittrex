@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Bittrex;
+use Bittrex::API;
 use FindBin;
 use Test::More;
 
@@ -18,7 +18,7 @@ if (defined $key and defined $secret) {
   plan skip_all => 'apikey not found';
 }
 
-my $bittrex = Bittrex->new($key, $secret);
+my $bittrex = Bittrex::API->new($key, $secret);
 
 #-------------------------------------------------------------------------------
 
@@ -33,5 +33,5 @@ ok(! $bittrex->getdepositaddress('*'));
 ok(! $bittrex->getdepositaddress());
 
 # remove API key...
-$bittrex = Bittrex->new();
+$bittrex = Bittrex::API->new();
 ok(! $bittrex->getdepositaddress('BTC'));

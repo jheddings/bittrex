@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Bittrex;
+use Bittrex::API;
 use Test::More;
 
 #-------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ unless (defined $key and defined $secret) {
   plan skip_all => 'apikey not found';
 }
 
-my $bittrex = Bittrex->new($key, $secret);
+my $bittrex = Bittrex::API->new($key, $secret);
 
 #-------------------------------------------------------------------------------
 sub verify_balance {
@@ -46,7 +46,7 @@ ok(! $bittrex->getbalance());
 ok(! $bittrex->getbalance('%'));
 
 # remove API key...
-$bittrex = Bittrex->new();
+$bittrex = Bittrex::API->new();
 
 ok(! $bittrex->getbalance('BTC'));
 

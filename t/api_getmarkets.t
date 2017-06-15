@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 
-use Bittrex;
+use Bittrex::API;
 use Test::Simple tests => 5;
 
-my $bittrex = Bittrex->new();
+my $bittrex = Bittrex::API->new();
 
 #-------------------------------------------------------------------------------
 

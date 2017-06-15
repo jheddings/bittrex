@@ -19,7 +19,7 @@ use Getopt::Long qw( :config bundling );
 use Scalar::Util qw( looks_like_number );
 use Pod::Usage;
 
-use Bittrex;
+use Bittrex::API;
 use Bittrex::Keyfile;
 use Config::Simple;
 use Data::Dumper;
@@ -177,7 +177,7 @@ if (defined $keyfile) {
 }
 
 # common client instance
-my $bittrex = Bittrex->new($apikey, $secret);
+my $bittrex = Bittrex::API->new($apikey, $secret);
 
 #---------------------------------------
 if (defined $do_getmarkets) {
