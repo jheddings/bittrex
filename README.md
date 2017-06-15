@@ -39,10 +39,10 @@ To install using the default options and location, use the following commands:
     make
     make install
 
-See [ExtUtils::MakeMaker](http://perldoc.perl.org/ExtUtils/MakeMaker.html) for customizing
-the installation.  Parameters may be optionally passed to `Makefile.PL` to alter the
-behavior.  The most common parameter to set is `INSTALL_BASE` which sets the top of the
-installation target.
+Parameters may be optionally passed to `Makefile.PL` to alter the
+behavior. See [ExtUtils::MakeMaker](http://perldoc.perl.org/ExtUtils/MakeMaker.html)
+for a full list of supported attributes.  The most common parameter to set is
+`INSTALL_BASE` which sets the top of the installation target.
 
 For example, to change the base installation path, use the following:
 
@@ -72,3 +72,7 @@ Copyright (c) 2017 Jason Heddings
 Licensed under the terms of the [MIT License](https://opensource.org/licenses/MIT),
 which is also included in the original [source code](https://github.com/jheddings/bittrex)
 of this project.
+
+# SEE ALSO
+
+[Bittrex::API](https://metacpan.org/pod/Bittrex::API)
