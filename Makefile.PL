@@ -16,8 +16,8 @@ WriteMakefile(
       'LWP::UserAgent' => 6.25,
       'URI::Query' => 0.10,
       'Digest::SHA' => 5.95,
-      'Config::Simple' => 4.0,
-      'Exporter::Easy' => 0.17
+      'LWP::Protocol::https' => 6.04,
+      'Config::Simple' => 4.0
     },
 );
 
