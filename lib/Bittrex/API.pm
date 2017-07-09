@@ -251,10 +251,10 @@ sub getmarketsummary {
   # the result comes back as an array with a single element...
   # peel it back to help the caller out
 
-  my $ret = _standard_result($json);
-  unless ($ret) { return undef };
+  my @ret = _standard_result($json);
+  unless (@ret) { return undef };
 
-  return @{ $ret }[0];
+  return $ret[0];
 }
 
 ################################################################################

@@ -30,12 +30,12 @@ sub verify_balance {
 #-------------------------------------------------------------------------------
 ## confirm all balances match
 
-my $balances = $bittrex->getbalances();
+my @balances = $bittrex->getbalances();
 
-ok($balances);
-ok(scalar @{ $balances } gt 0);
+ok(@balances);
+ok(scalar @balances gt 0);
 
-foreach (@{ $balances }) {
+foreach (@balances) {
   verify_balance($_->{Currency}, $_->{Balance});
 }
 

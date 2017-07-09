@@ -10,15 +10,15 @@ my $bittrex = Bittrex::API->new();
 
 #-------------------------------------------------------------------------------
 
-my $data = $bittrex->getcurrencies();
+my @data = $bittrex->getcurrencies();
 
-ok($data);
-ok(scalar @{ $data } gt 0);
+ok(@data);
+ok(scalar @data gt 0);
 
 # make sure BTC is in there...
 
 my $btc = undef;
-foreach (@{ $data }) {
+foreach (@data) {
   next unless exists $_->{Currency};
 
   if ($_->{Currency} eq 'BTC') {

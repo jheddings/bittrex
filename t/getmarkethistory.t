@@ -10,12 +10,12 @@ my $bittrex = Bittrex::API->new();
 
 #-------------------------------------------------------------------------------
 
-my $hist = $bittrex->getmarkethistory('BTC-LTC');
+my @hist = $bittrex->getmarkethistory('BTC-LTC');
 
-ok(defined $hist);
-ok(scalar @{ $hist } gt 0);
+ok(@hist);
+ok(scalar @hist gt 0);
 
-my $order = @{ $hist }[0];
+my $order = $hist[0];
 ok(exists $order->{Id});
 
 # some basic negative testing...
