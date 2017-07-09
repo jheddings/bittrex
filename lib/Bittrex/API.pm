@@ -149,7 +149,10 @@ sub _standard_result {
     return undef;
   }
 
-  return $json->{result};
+  my $result = $json->{result};
+
+  # if the results are an array, return appropriately
+  return (ref($result) eq 'ARRAY') ? @{ $result } : $result
 }
 
 ################################################################################
